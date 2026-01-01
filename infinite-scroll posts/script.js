@@ -2,44 +2,71 @@ const postsContainer = document.getElementById("posts-container");
 const loader = document.getElementById("loader");
 const filter = document.getElementById("filter");
 
-const totalPosts = 1000; // Simulated high-volume posts
-const postHeight = 120; // Approximate height including margin
-const buffer = 5; // Number of extra posts rendered above & below viewport
+const postHeight = 120;
+const buffer = 5;
 
-let postsData = []; // Offline dataset
-let renderedPosts = new Map(); // Track DOM nodes
+let postsData = [];           // All fetched posts
+let renderedPosts = new Map(); // Visible DOM nodes
 let scrollTop = 0;
 
-// Generate offline posts for demo/portfolio
-for (let i = 1; i <= totalPosts; i++) {
-  postsData.push({
-    id: i,
-    title: `Post Title ${i}`,
-    body: `This is the body content of post number ${i}. It is generated for virtual scroll demo.`
-  });
-}
+let page = 1;                  // Pagination for API
+const limit = 20;
+let isLoading = false;
+let abortController = null;
 
-// Utility to capitalize
+// Utility: Capitalize text
 function capitalize(text) {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
-// Render visible posts only
+// Show loader
+function showLoader(show = true) {
+  loader.classList.toggle("show", show);
+}
+
+// Fetch posts from API with AbortController
+async function fetchPosts() {
+  if (isLoading) return;
+  isLoading = true;
+
+  showLoader(true);
+
+  if (abortController) {
+    abortController.abort(); // Cancel previous request
+  }
+  abortController = new AbortController();
+  const signal = abortController.signal;
+
+  try {
+    const res = await fetch(
+      `https://jsonplaceholder.typicode.com/posts?_limit=${limit}&_page=${page}`,
+      { signal }
+    );
+    const data = await res.json();
+    postsData.push(...data);
+    page++;
+    renderPosts();
+  } catch (err) {
+    if (err.name !== 'AbortError') {
+      console.error("Fetch error:", err);
+    }
+  } finally {
+    showLoader(false);
+    isLoading = false;
+  }
+}
+
+// Render visible posts only (virtual scroll)
 function renderPosts() {
-  const containerHeight = postsContainer.clientHeight;
   const viewportTop = scrollTop;
   const viewportBottom = viewportTop + window.innerHeight;
 
-  // Calculate start/end indices
-  let startIdx = Math.floor(viewportTop / postHeight) - buffer;
-  let endIdx = Math.ceil(viewportBottom / postHeight) + buffer;
+  const startIdx = Math.max(0, Math.floor(viewportTop / postHeight) - buffer);
+  const endIdx = Math.min(postsData.length - 1, Math.ceil(viewportBottom / postHeight) + buffer);
 
-  startIdx = Math.max(0, startIdx);
-  endIdx = Math.min(postsData.length - 1, endIdx);
-
-  const currentIds = new Set();
+  const visibleIds = new Set();
   for (let i = startIdx; i <= endIdx; i++) {
-    currentIds.add(postsData[i].id);
+    visibleIds.add(postsData[i].id);
     if (!renderedPosts.has(postsData[i].id)) {
       const postEl = document.createElement("div");
       postEl.className = "post";
@@ -54,47 +81,47 @@ function renderPosts() {
       postsContainer.appendChild(postEl);
       renderedPosts.set(postsData[i].id, postEl);
     } else {
-      // Update position in case of resize
       renderedPosts.get(postsData[i].id).style.top = `${i * postHeight}px`;
     }
   }
 
   // Remove posts outside viewport
   renderedPosts.forEach((el, id) => {
-    if (!currentIds.has(id)) {
+    if (!visibleIds.has(id)) {
       postsContainer.removeChild(el);
       renderedPosts.delete(id);
     }
   });
 
-  // Update container height
   postsContainer.style.height = `${postsData.length * postHeight}px`;
 }
 
-// Debounce scroll events for performance
+// Handle scroll with debounce
 let scrollTimeout;
 window.addEventListener("scroll", () => {
   scrollTop = window.scrollY;
   if (scrollTimeout) clearTimeout(scrollTimeout);
   scrollTimeout = setTimeout(() => {
     renderPosts();
-  }, 20); // 20ms debounce
+
+    // Fetch next page if near bottom
+    if (window.innerHeight + scrollTop >= postsContainer.scrollHeight - 5) {
+      fetchPosts();
+    }
+  }, 20);
 });
 
-// Filter posts by search term
-filter.addEventListener("input", (e) => {
+// Filter posts live
+filter.addEventListener("input", e => {
   const term = e.target.value.toLowerCase();
-  renderedPosts.forEach((el) => {
+  renderedPosts.forEach(el => {
     const title = el.querySelector(".post-title").innerText.toLowerCase();
     const body = el.querySelector(".post-body").innerText.toLowerCase();
-    if (title.includes(term) || body.includes(term)) {
-      el.style.display = "flex";
-    } else {
-      el.style.display = "none";
-    }
+    el.style.display = title.includes(term) || body.includes(term) ? "flex" : "none";
   });
 });
 
 // Initialize
-renderPosts();
+fetchPosts();
+
 
