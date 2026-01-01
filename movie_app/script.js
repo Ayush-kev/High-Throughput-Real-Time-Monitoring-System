@@ -1,57 +1,152 @@
-const KEY = "3fd2be6f0c70a2a598f084ddfb75487c";
-// For educational purposes only - DO NOT USE in production
-// Request your own key for free: https://developers.themoviedb.org/3
-const API_URL = `https://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=${KEY}&page=1`;
-const IMG_PATH = "https://image.tmdb.org/t/p/w1280";
-const SEARCH_API = `https://api.themoviedb.org/3/search/movie?api_key=${KEY}&query=`;
+/* =====================
+   CONFIG
+===================== */
+const API_KEY = "3fd2be6f0c70a2a598f084ddfb75487c";
+const BASE_URL = "https://api.themoviedb.org/3";
+const IMG_BASE_URL = "https://image.tmdb.org/t/p/w500";
 
-const main = document.getElementById("main");
-const form = document.getElementById("form");
-const search = document.getElementById("search");
+/* =====================
+   DOM REFERENCES
+===================== */
+const movieGrid = document.getElementById("movie-grid");
+const searchInput = document.getElementById("search-input");
+const statusEl = document.getElementById("status");
 
-const getClassByRate = (vote) => {
-  if (vote >= 7.5) return "green";
-  else if (vote >= 7) return "orange";
-  else return "red";
+/* =====================
+   APP STATE
+===================== */
+const state = {
+  query: "",
+  isLoading: false,
 };
 
-const showMovies = (movies) => {
-  main.innerHTML = "";
+/* =====================
+   UTILITIES
+===================== */
+const getRatingClass = (rating) => {
+  if (rating >= 7.5) return "green";
+  if (rating >= 7) return "orange";
+  return "red";
+};
+
+const debounce = (fn, delay = 500) => {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), delay);
+  };
+};
+
+/* =====================
+   UI HELPERS
+===================== */
+const showStatus = (message) => {
+  statusEl.textContent = message;
+  statusEl.classList.remove("hidden");
+};
+
+const hideStatus = () => {
+  statusEl.classList.add("hidden");
+};
+
+const clearMovies = () => {
+  movieGrid.innerHTML = "";
+};
+
+/* =====================
+   API
+===================== */
+const fetchMovies = async (endpoint) => {
+  try {
+    state.isLoading = true;
+    showStatus("Loading movies...");
+
+    const res = await fetch(`${BASE_URL}${endpoint}&api_key=${API_KEY}`);
+    if (!res.ok) throw new Error("Failed to fetch movies");
+
+    const data = await res.json();
+    renderMovies(data.results);
+
+    if (!data.results.length) {
+      showStatus("No movies found.");
+    } else {
+      hideStatus();
+    }
+  } catch (error) {
+    showStatus("Something went wrong. Please try again.");
+    console.error(error);
+  } finally {
+    state.isLoading = false;
+  }
+};
+
+/* =====================
+   RENDER
+===================== */
+const renderMovies = (movies) => {
+  clearMovies();
+
   movies.forEach((movie) => {
-    const { title, poster_path, vote_average, overview } = movie;
-    const movieElement = document.createElement("div");
-    movieElement.classList.add("movie");
-    movieElement.innerHTML = `
-    <img
-      src="${IMG_PATH + poster_path}"
-      alt="${title}"
-    />
-    <div class="movie-info">
-      <h3>${title}</h3>
-      <span class="${getClassByRate(vote_average)}">${vote_average}</span>
-    </div>
-    <div class="overview">
-      <h3>Overview</h3>
-      ${overview}
-    </div>
-  `;
-    main.appendChild(movieElement);
+    const {
+      title,
+      poster_path,
+      vote_average,
+      overview,
+    } = movie;
+
+    const card = document.createElement("article");
+    card.className = "movie-card";
+
+    const poster = poster_path
+      ? `${IMG_BASE_URL}${poster_path}`
+      : "https://via.placeholder.com/500x750?text=No+Image";
+
+    card.innerHTML = `
+      <img
+        src="${poster}"
+        alt="${title}"
+        class="movie-poster"
+        loading="lazy"
+      />
+
+      <div class="movie-info">
+        <h3 class="movie-title">${title}</h3>
+        <span class="movie-rating ${getRatingClass(vote_average)}">
+          ${vote_average.toFixed(1)}
+        </span>
+      </div>
+
+      <div class="movie-overview">
+        ${overview || "No description available."}
+      </div>
+    `;
+
+    movieGrid.appendChild(card);
   });
 };
 
-const getMovies = async (url) => {
-  const res = await fetch(url);
-  const data = await res.json();
-  showMovies(data.results);
+/* =====================
+   EVENT HANDLERS
+===================== */
+const handleSearch = debounce((event) => {
+  const query = event.target.value.trim();
+  state.query = query;
+
+  if (!query) {
+    fetchPopularMovies();
+    return;
+  }
+
+  fetchMovies(`/search/movie?query=${encodeURIComponent(query)}`);
+});
+
+/* =====================
+   INIT
+===================== */
+const fetchPopularMovies = () => {
+  fetchMovies("/discover/movie?sort_by=popularity.desc");
 };
 
-getMovies(API_URL);
+searchInput.addEventListener("input", handleSearch);
+fetchPopularMovies();
 
-form.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const searchTerm = search.value;
-  if (searchTerm && searchTerm !== "") {
-    getMovies(SEARCH_API + searchTerm);
-    search.value = "";
-  } else history.go(0);
-});
