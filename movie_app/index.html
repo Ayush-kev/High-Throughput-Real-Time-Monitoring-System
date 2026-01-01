@@ -3,22 +3,48 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Search and explore movies with ratings and overviews using a high-performance Vanilla JavaScript application." />
     <link rel="stylesheet" href="style.css" />
-    <title>Movie App</title>
+    <title>Movie Explorer • Vanilla JS</title>
   </head>
+
   <body>
-    <header>
-      <h1>Should I watch it?</h1>
-      <form id="form">
-        <input type="text" placeholder="Search" id="search" class="search" />
-      </form>
+    <header class="app-header">
+      <div class="container">
+        <h1 class="logo">Movie Explorer</h1>
+
+        <form id="search-form" role="search" aria-label="Movie search">
+          <input
+            type="search"
+            id="search-input"
+            class="search-input"
+            placeholder="Search movies..."
+            aria-label="Search movies by title"
+            autocomplete="off"
+          />
+        </form>
+      </div>
     </header>
-    <main id="main"></main>
-    <footer class="footer">
+
+    <main class="app-main">
+      <div class="container">
+
+        <!-- Status Messages -->
+        <section id="status" class="status hidden" aria-live="polite"></section>
+
+        <!-- Movie Results -->
+        <section id="movie-grid" class="movie-grid" aria-label="Movie results"></section>
+
+      </div>
+    </main>
+
+    <footer class="app-footer">
       <p>
-        This project uses the TMDb API but is not endorsed or certified by TMDb.
+        Powered by TMDb API. This product is not endorsed or certified by TMDb.
       </p>
     </footer>
-    <script src="script.js"></script>
+
+    <script src="script.js" defer></script>
   </body>
 </html>
+
