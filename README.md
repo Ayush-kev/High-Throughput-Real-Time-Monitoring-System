@@ -17,7 +17,7 @@ A high-performance monitoring system built with Vanilla JavaScript to tackle the
 🚀 Key Features
 
 Custom Virtual Scroll
-Efficiently handles 10,000+ data entries by rendering only the visible items. Reduces DOM overhead by 99% while keeping a 60fps refresh rate.
+Efficiently handles high volume data entries by rendering only the visible items. Reduces DOM overhead by 99% while keeping a 60fps refresh rate.
 
 Race-Condition Protection
 Uses AbortController to manage multiple API requests simultaneously, ensuring the UI stays consistent even during rapid updates.
