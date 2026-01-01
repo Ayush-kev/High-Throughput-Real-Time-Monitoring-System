@@ -1,59 +1,41 @@
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap");
 
-* {
-  box-sizing: border-box;
-}
-
 body {
-  background-color: #f8f9fd;
   font-family: "Roboto", sans-serif;
+  background-color: #f8f9fd;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
-  padding: 20px;
+  align-items: start;
+  padding: 20px 10px;
   margin: 0;
-  min-height: 100vh;
 }
 
 .container {
-  max-width: 350px;
-  border-radius: 6px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+  max-width: 400px;
+  border-radius: 5px;
+  box-shadow: 3px 3px 10px rgba(0,0,0,0.2);
   overflow: hidden;
-  background-color: #fff;
 }
 
 .header {
   background-color: #3e57db;
   color: #fff;
   padding: 30px 20px;
-}
-
-.title {
-  margin: 0;
-  font-weight: 700;
-}
-
-.subtitle {
-  display: block;
-  margin: 5px 0 20px;
-  font-size: 13px;
-  opacity: 0.85;
+  text-align: center;
 }
 
 .header input {
   width: 100%;
   padding: 10px 15px;
-  font-size: 14px;
-  border: none;
   border-radius: 50px;
-  background-color: rgba(0,0,0,0.25);
+  border: none;
+  margin-top: 15px;
+  font-size: 14px;
+  background-color: rgba(0,0,0,0.3);
   color: #fff;
-  transition: background 0.3s;
 }
 
 .header input:focus {
-  background-color: rgba(0,0,0,0.35);
   outline: none;
 }
 
@@ -61,31 +43,24 @@ body {
   list-style: none;
   margin: 0;
   padding: 0;
-  max-height: 400px;
+  max-height: 500px;
   overflow-y: auto;
+  background-color: #fff;
 }
 
 .user-list li {
   display: flex;
   align-items: center;
-  padding: 15px 20px;
+  padding: 15px;
   border-bottom: 1px solid #eee;
-  transition: background 0.2s;
-}
-
-.user-list li:hover {
-  background-color: #f1f1f1;
 }
 
 .user-list img {
+  border-radius: 50%;
   width: 50px;
   height: 50px;
   object-fit: cover;
-  border-radius: 50%;
-}
-
-.user-info {
-  margin-left: 12px;
+  margin-right: 10px;
 }
 
 .user-info h4 {
@@ -96,17 +71,11 @@ body {
 .user-info p {
   margin: 0;
   font-size: 12px;
-  opacity: 0.7;
+  color: #555;
 }
 
 .user-list li.hide {
   display: none;
 }
 
-.user-list li.no-result {
-  justify-content: center;
-  padding: 20px;
-  font-style: italic;
-  color: #555;
-}
 
