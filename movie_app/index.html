@@ -1,50 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Search and explore movies with ratings and overviews using a high-performance Vanilla JavaScript application." />
-    <link rel="stylesheet" href="style.css" />
-    <title>Movie Explorer • Vanilla JS</title>
-  </head>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Search and explore movies with ratings and overviews using a high-performance Vanilla JavaScript application.">
+  <title>Movie Explorer • Vanilla JS</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-  <body>
-    <header class="app-header">
-      <div class="container">
-        <h1 class="logo">Movie Explorer</h1>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="container">
+      <h1 class="logo">Movie Explorer</h1>
+      <form id="search-form" role="search" aria-label="Movie search">
+        <input
+          type="search"
+          id="search-input"
+          class="search-input"
+          placeholder="Search movies..."
+          aria-label="Search movies by title"
+          autocomplete="off"
+        />
+      </form>
+    </div>
+  </header>
 
-        <form id="search-form" role="search" aria-label="Movie search">
-          <input
-            type="search"
-            id="search-input"
-            class="search-input"
-            placeholder="Search movies..."
-            aria-label="Search movies by title"
-            autocomplete="off"
-          />
-        </form>
-      </div>
-    </header>
+  <!-- Main Content -->
+  <main class="app-main">
+    <div class="container">
 
-    <main class="app-main">
-      <div class="container">
+      <!-- Status Messages -->
+      <section id="status" class="status hidden" aria-live="polite"></section>
 
-        <!-- Status Messages -->
-        <section id="status" class="status hidden" aria-live="polite"></section>
+      <!-- Movie Results Grid -->
+      <section id="movie-grid" class="movie-grid" aria-label="Movie results"></section>
 
-        <!-- Movie Results -->
-        <section id="movie-grid" class="movie-grid" aria-label="Movie results"></section>
+    </div>
+  </main>
 
-      </div>
-    </main>
+  <!-- Footer -->
+  <footer class="app-footer">
+    <p>Powered by TMDb API. This product is not endorsed or certified by TMDb.</p>
+  </footer>
 
-    <footer class="app-footer">
-      <p>
-        Powered by TMDb API. This product is not endorsed or certified by TMDb.
-      </p>
-    </footer>
-
-    <script src="script.js" defer></script>
-  </body>
+  <!-- Scripts -->
+  <script src="script.js" defer></script>
+</body>
 </html>
-
